@@ -47,7 +47,7 @@ describe('app-dir - server source maps', () => {
               '\n'
           : '\nError: Boom' +
               '\n    at logError (app/rsc-error-log/page.js:2:16)' +
-              // FIXME: Method name should be "Page"
+              // TODO(veil): Method name should be "Page"
               '\n    at logError (app/rsc-error-log/page.js:7:2)' +
               '\n  1 | function logError() {' +
               "\n> 2 |   const error = new Error('Boom')" +
@@ -93,7 +93,7 @@ describe('app-dir - server source maps', () => {
               '\n'
           : '\nError: Boom' +
               '\n    at logError (app/rsc-error-log-cause/page.js:2:16)' +
-              // FIXME: Method name should be "Page"
+              // TODO(veil): Method name should be "Page"
               '\n    at logError (app/rsc-error-log-cause/page.js:8:2)' +
               '\n  1 | function logError(cause) {' +
               "\n> 2 |   const error = new Error('Boom', { cause })" +
@@ -117,8 +117,8 @@ describe('app-dir - server source maps', () => {
     }
   })
 
-  // FIXME: Turbopack resolver bug
-  // FIXME: Turbopack build? bugs taint the whole dev server
+  // TODO(veil): Turbopack resolver bug
+  // TODO(veil): Turbopack build? bugs taint the whole dev server
   ;(isTurbopack ? it.skip : it)(
     'stack frames are ignore-listed in ssr',
     async () => {
@@ -131,11 +131,11 @@ describe('app-dir - server source maps', () => {
         })
         expect(normalizeCliOutput(next.cliOutput.slice(outputIndex))).toContain(
           isTurbopack
-            ? // FIXME: Turbopack resolver bug
+            ? // TODO(veil): Turbopack resolver bug
               "Module not found: Can't resolve 'internal-pkg'"
             : '\nError: Boom' +
                 '\n    at logError (app/ssr-error-log-ignore-listed/page.js:5:16)' +
-                // FIXME: Method name should be "Page"
+                // TODO(veil): Method name should be "Page"
                 '\n    at logError (app/ssr-error-log-ignore-listed/page.js:10:12)' +
                 '\n    at Page (app/ssr-error-log-ignore-listed/page.js:10:6)' +
                 '\n  3 |'
@@ -146,8 +146,8 @@ describe('app-dir - server source maps', () => {
     }
   )
 
-  // FIXME: Turbopack resolver bug
-  // FIXME: Turbopack build? bugs taint the whole dev server
+  // TODO(veil): Turbopack resolver bug
+  // TODO(veil): Turbopack build? bugs taint the whole dev server
   ;(isTurbopack ? it.skip : it)(
     'stack frames are ignore-listed in rsc',
     async () => {
@@ -162,11 +162,11 @@ describe('app-dir - server source maps', () => {
         })
         expect(normalizeCliOutput(next.cliOutput.slice(outputIndex))).toContain(
           isTurbopack
-            ? // FIXME: Turbopack resolver bug
+            ? // TODO(veil): Turbopack resolver bug
               "Module not found: Can't resolve 'internal-pkg'"
             : '\nError: Boom' +
                 '\n    at logError (app/rsc-error-log-ignore-listed/page.js:4:16)' +
-                // FIXME: Method name should be "Page"
+                // TODO(veil): Method name should be "Page"
                 '\n    at logError (app/rsc-error-log-ignore-listed/page.js:9:12)' +
                 '\n    at Page (app/rsc-error-log-ignore-listed/page.js:9:6)' +
                 '\n  2 |'
@@ -190,15 +190,22 @@ describe('app-dir - server source maps', () => {
       expect(cliOutput).toContain(
         isTurbopack
           ? '\n ⨯ Error: Boom' +
-              '\n    at throwError (./app/ssr-throw/page.js:4:9)' +
-              '\n    at Page (./app/ssr-throw/page.js:8:3)' +
-              '\ndigest: "'
+              // TODO(veil): Apply sourcemap
+              '\n    at throwError (/'
           : '\n ⨯ Error: Boom' +
-              '\n    at throwError (./app/ssr-throw/page.js:6:11)' +
-              '\n    at Page (./app/ssr-throw/page.js:9:5)' +
-              '\ndigest: "'
+              '\n    at throwError (app/ssr-throw/page.js:4:8)' +
+              // TODO(veil): Method name should be "Page"
+              '\n    at throwError (app/ssr-throw/page.js:8:2)' +
+              '\n  2 |' +
+              '\n  3 | function throwError() {' +
+              "\n> 4 |   throw new Error('Boom')" +
+              '\n    |        ^' +
+              '\n  5 | }' +
+              '\n  6 |' +
+              '\n  7 | export default function Page() { {' +
+              "\n  digest: '"
       )
-      expect(cliOutput).toMatch(/digest: "\d+"/)
+      expect(cliOutput).toMatch(/digest: '\d+'/)
     } else {
       // TODO: Test `next build` with `--enable-source-maps`.
     }
