@@ -18,6 +18,10 @@ const customJestConfig = {
   modulePathIgnorePatterns: ['/\\.next/'],
   modulePaths: ['<rootDir>/lib'],
   transformIgnorePatterns: ['/next[/\\\\]dist/', '/\\.next/'],
+  testPathIgnorePatterns: [
+    // devlow uses native esm and uses Node's built-in test runner
+    '<rootDir>/turbopack/packages/devlow-bench/',
+  ],
   moduleNameMapper: {
     '@next/font/(.*)': '@next/font/$1',
   },
