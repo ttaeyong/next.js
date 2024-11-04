@@ -159,12 +159,6 @@ async function exportPageImpl(
     const normalizedPage = isAppDir ? normalizeAppPath(page) : page
 
     params = getParams(normalizedPage, updatedPath)
-    if (params) {
-      query = {
-        ...query,
-        ...params,
-      }
-    }
   }
 
   const { req, res } = createRequestResponseMocks({ url: updatedPath })
@@ -315,7 +309,10 @@ async function exportPageImpl(
     res,
     path,
     page,
-    query,
+    {
+      ...query,
+      ...params,
+    },
     htmlFilepath,
     htmlFilename,
     ampPath,
