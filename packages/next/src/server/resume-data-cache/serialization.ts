@@ -1,5 +1,10 @@
-import type { ImmutableResumeDataCache } from './resume-data-cache'
-import { UseCacheCacheStore, FetchCacheStore } from './cache-store'
+import type { RenderResumeDataCache } from './resume-data-cache'
+import {
+  parseUseCacheCacheStore,
+  parseFetchCacheStore,
+  stringifyFetchCacheStore,
+  stringifyUseCacheCacheStore,
+} from './cache-store'
 
 type ResumeStoreSerialized = {
   store: {
@@ -16,7 +21,7 @@ type ResumeStoreSerialized = {
  * Serializes an immutable resume data cache into a JSON string.
  */
 export async function stringifyResumeDataCache(
-  resumeDataCache: ImmutableResumeDataCache
+  resumeDataCache: RenderResumeDataCache
 ): Promise<string> {
   if (resumeDataCache.fetch.size === 0 && resumeDataCache.cache.size === 0) {
     return 'null'
@@ -24,8 +29,12 @@ export async function stringifyResumeDataCache(
 
   const json: ResumeStoreSerialized = {
     store: {
-      fetch: Object.fromEntries(await resumeDataCache.fetch.entries()),
-      cache: Object.fromEntries(await resumeDataCache.cache.entries()),
+      fetch: Object.fromEntries(
+        stringifyFetchCacheStore(resumeDataCache.fetch.entries())
+      ),
+      cache: Object.fromEntries(
+        await stringifyUseCacheCacheStore(resumeDataCache.cache.entries())
+      ),
     },
   }
 
@@ -36,17 +45,17 @@ export async function stringifyResumeDataCache(
  * Parses a serialized resume data cache into an immutable version of the cache.
  * This cache cannot be mutated further, and is returned sealed.
  */
-export function parseResumeDataCache(text: string): ImmutableResumeDataCache {
+export function parseResumeDataCache(text: string): RenderResumeDataCache {
   if (text === 'null') {
     return {
-      cache: new UseCacheCacheStore([]),
-      fetch: new FetchCacheStore([]),
+      cache: new Map(),
+      fetch: new Map(),
     }
   }
 
   const json: ResumeStoreSerialized = JSON.parse(text)
   return {
-    cache: new UseCacheCacheStore(Object.entries(json.store.cache)),
-    fetch: new FetchCacheStore(Object.entries(json.store.fetch)),
+    cache: parseUseCacheCacheStore(Object.entries(json.store.cache)),
+    fetch: parseFetchCacheStore(Object.entries(json.store.fetch)),
   }
 }

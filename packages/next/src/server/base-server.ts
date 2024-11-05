@@ -2692,9 +2692,9 @@ export default abstract class Server<
 
               // If the warmup is successful, we should use the resume data
               // cache from the warmup.
-              if (warmup.metadata.devWarmupImmutableResumeDataCache) {
-                renderOpts.devWarmupImmutableResumeDataCache =
-                  warmup.metadata.devWarmupImmutableResumeDataCache
+              if (warmup.metadata.devWarmupPrerenderResumeDataCache) {
+                renderOpts.devWarmupRenderResumeDataCache =
+                  warmup.metadata.devWarmupPrerenderResumeDataCache
               }
             }
 

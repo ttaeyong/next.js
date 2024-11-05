@@ -1,6 +1,6 @@
 import type { FallbackRouteParams } from '../../server/request/fallback-params'
 import type { Params } from '../request/params'
-import type { ImmutableResumeDataCache } from '../resume-data-cache/resume-data-cache'
+import type { RenderResumeDataCache } from '../resume-data-cache/resume-data-cache'
 import {
   parseResumeDataCache,
   stringifyResumeDataCache,
@@ -30,7 +30,7 @@ export type DynamicDataPostponedState = {
   /**
    * The immutable resume data cache.
    */
-  readonly immutableResumeDataCache: ImmutableResumeDataCache
+  readonly renderResumeDataCache: RenderResumeDataCache
 }
 
 /**
@@ -50,7 +50,7 @@ export type DynamicHTMLPostponedState = {
   /**
    * The immutable resume data cache.
    */
-  readonly immutableResumeDataCache: ImmutableResumeDataCache
+  readonly renderResumeDataCache: RenderResumeDataCache
 }
 
 export type PostponedState =
@@ -60,14 +60,14 @@ export type PostponedState =
 export async function getDynamicHTMLPostponedState(
   data: object,
   fallbackRouteParams: FallbackRouteParams | null,
-  immutableResumeDataCache: ImmutableResumeDataCache
+  renderResumeDataCache: RenderResumeDataCache
 ): Promise<string> {
   if (!fallbackRouteParams || fallbackRouteParams.size === 0) {
     const postponedString = JSON.stringify(data)
 
-    // Serialized as `<postponedString.length>:<postponedString><immutableResumeDataCache>`
+    // Serialized as `<postponedString.length>:<postponedString><renderResumeDataCache>`
     return `${postponedString.length}:${postponedString}${await stringifyResumeDataCache(
-      immutableResumeDataCache
+      renderResumeDataCache
     )}`
   }
 
@@ -78,14 +78,14 @@ export async function getDynamicHTMLPostponedState(
   // Serialized as `<replacements.length><replacements><data>`
   const postponedString = `${replacementsString.length}${replacementsString}${dataString}`
 
-  // Serialized as `<postponedString.length>:<postponedString><immutableResumeDataCache>`
-  return `${postponedString.length}:${postponedString}${await stringifyResumeDataCache(immutableResumeDataCache)}`
+  // Serialized as `<postponedString.length>:<postponedString><renderResumeDataCache>`
+  return `${postponedString.length}:${postponedString}${await stringifyResumeDataCache(renderResumeDataCache)}`
 }
 
 export async function getDynamicDataPostponedState(
-  immutableResumeDataCache: ImmutableResumeDataCache
+  renderResumeDataCache: RenderResumeDataCache
 ): Promise<string> {
-  return `4:null${await stringifyResumeDataCache(immutableResumeDataCache)}`
+  return `4:null${await stringifyResumeDataCache(renderResumeDataCache)}`
 }
 
 export function parsePostponedState(
@@ -106,13 +106,13 @@ export function parsePostponedState(
     postponedStringLengthMatch.length + postponedStringLength + 1
   )
 
-  const immutableResumeDataCache = parseResumeDataCache(
+  const renderResumeDataCache = parseResumeDataCache(
     state.slice(postponedStringLengthMatch.length + postponedStringLength + 1)
   )
 
   try {
     if (postponedString === 'null') {
-      return { type: DynamicState.DATA, immutableResumeDataCache }
+      return { type: DynamicState.DATA, renderResumeDataCache }
     }
 
     if (/^[0-9]/.test(postponedString)) {
@@ -143,18 +143,18 @@ export function parsePostponedState(
       return {
         type: DynamicState.HTML,
         data: JSON.parse(postponed),
-        immutableResumeDataCache,
+        renderResumeDataCache,
       }
     }
 
     return {
       type: DynamicState.HTML,
       data: JSON.parse(postponedString),
-      immutableResumeDataCache,
+      renderResumeDataCache,
     }
   } catch (err) {
     console.error('Failed to parse postponed state', err)
-    return { type: DynamicState.DATA, immutableResumeDataCache }
+    return { type: DynamicState.DATA, renderResumeDataCache }
   }
 }
 
